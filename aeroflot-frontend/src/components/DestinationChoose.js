@@ -8,6 +8,10 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClearIcon from '@mui/icons-material/Clear';
 import {API_SERVER} from '../service/config'
 import {useState, useEffect, forwardRef, Fragment} from 'react';
+import { setCodeFrom, setCodeTo, setDefaultAirportTo, setDefaultAirportFrom } from '../slices/searchSlice';
+import { setAirports } from '../slices/airportsSlice';
+
+import { useDispatch, useSelector } from 'react-redux'
 
 const Autocomplete = forwardRef(function Autocomplete(props, ref) {
   const {
@@ -112,8 +116,17 @@ Autocomplete.propTypes = {
   readOnly: PropTypes.bool,
 };
 
-export default function AirportChoose() {
-  const [airports, setAirports] = useState();
+export default function AirportChoose(props) {
+
+  const dispatch = useDispatch()
+
+  const airports = useSelector((state) => {
+      return state.airport.airports;
+    })
+
+  const {datetime_from, code_from, code_to, fare_class, need_search, defaultAirportFrom, defaultAirportTo} = useSelector((state) => {
+      return state.ticket.searchState;
+    })
 
   const fetchAirports = async() =>{
     try {
@@ -121,18 +134,46 @@ export default function AirportChoose() {
             `${API_SERVER}/airports/get_airports/`
         );
         const json = await response.json();
-        console.log(json)
-        setAirports(json.map(airport => ({label:`${airport.name} (${airport.code})`, code: airport.code})));
+        dispatch(setAirports(json.map(airport => ({label:`${airport.name} (${airport.code})`, code: airport.code}))));
+
+        console.log('REQUESTED', props.is_from)
+        let defaultAirportFromRow = json.filter(airport => airport.code === code_from)[0]
+        let defaultAirportToRow = json.filter(airport => airport.code === code_to)[0]
+
+        dispatch(setDefaultAirportFrom({label:`${defaultAirportFromRow.name} (${defaultAirportFromRow.code})`, code: defaultAirportFromRow.code}))
+        dispatch(setDefaultAirportTo({label:`${defaultAirportToRow.name} (${defaultAirportToRow.code})`, code: defaultAirportToRow.code}))
+
     } catch (e) {
         console.error(e);
     }
   };
 
   useEffect(() => {
-    fetchAirports();
-  }, []);
+    if (airports.length < 2) {
+      fetchAirports();
+    }
+  }, [airports]);
 
-  return <Autocomplete options={airports} />;
+  //console.log(airports)
+  return <Autocomplete
+            options={airports}
+            isOptionEqualToValue={(option, value) => option.code === value.code}
+            onChange={(e, value) => {
+              if (typeof value === 'undefined' || value === null)  {
+                return
+              }
+              if (props.is_from) {
+                console.log(value, 'from')
+                dispatch(setDefaultAirportFrom(value))
+                dispatch(setCodeFrom(value.code))
+              } else {
+                console.log(value, 'to')
+                dispatch(setDefaultAirportTo(value))
+                dispatch(setCodeTo(value.code))
+              }
+            }}
+            value={props.is_from ? defaultAirportFrom : defaultAirportTo}
+          />;
 }
 
 const blue = {

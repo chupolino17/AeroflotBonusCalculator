@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+
+  pgdb:
+    image: postgres:17
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    container_name: pgdb
+    volumes:
+      - pgdbdata:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+
+  django:
+    build:
+      context: ./aeroflot_backend
+    container_name: django
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./aeroflot_backend:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - pgdb
+
+  frontend:
+    build: ./aeroflot-frontend
+    container_name: frontend
+    volumes:
+      - ./aeroflot-frontend:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    depends_on:
+      - pgdb
+      - django
+
+volumes:
+  pgdbdata: null

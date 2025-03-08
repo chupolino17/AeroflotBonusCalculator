@@ -4,8 +4,17 @@ from .external_requester import get_cities_from_aeroflot
 
 
 def get_airports(request):
-    records = list(Airport.objects.values())
-    return JsonResponse(records, safe=False)
+    response = []
+    code_set = set()
+    for city in list(City.objects.values()):
+        if city['code'] not in code_set:
+            code_set.add(city['code'])
+            response.append(city)
+    for airport in list(Airport.objects.values()):
+        if airport['code'] not in code_set:
+            code_set.add(airport['code'])
+            response.append(airport)
+    return JsonResponse(response, safe=False)
 
 def update_airports(request):
     cities = get_cities_from_aeroflot()

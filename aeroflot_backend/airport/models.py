@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class City(models.Model):
     code = models.CharField(max_length=3)
     country = models.CharField(max_length=2)
@@ -10,7 +9,6 @@ class City(models.Model):
     def __str__(self):
         return '{} ({})'.format(self.name, self.code)
 
-
 class Airport(models.Model):
     code = models.CharField(max_length=3)
     name = models.TextField()
@@ -18,5 +16,3 @@ class Airport(models.Model):
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.code)
-
-

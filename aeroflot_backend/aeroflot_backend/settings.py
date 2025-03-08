@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-=2m(&1den$o@64*6o1p&j#o$5u^r1=rdp(d70q@%ispu-5@=7)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 
 # Application definition
@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user',
-    'top_flights',
     'airport',
     'search',
-    'corsheaders'
+    'corsheaders',
+    'miles',
+    'django.contrib.postgres'
 ]
 
 MIDDLEWARE = [
@@ -82,11 +83,14 @@ WSGI_APPLICATION = 'aeroflot_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'pgdb',
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

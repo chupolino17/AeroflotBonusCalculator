@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 
+import { useNavigate } from "react-router-dom";
 
 const StyledBox = {
     alignSelf: 'center',
@@ -31,12 +32,8 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 }));
 
 export default function AppAppBar() {
-  const [open, setOpen] = React.useState(false);
 
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
-  };
-
+  const navigate = useNavigate();
   return (
     <React.Fragment>
     <AppBar
@@ -53,13 +50,13 @@ export default function AppAppBar() {
         <StyledToolbar variant="dense" disableGutters>
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', px: 0 }}>
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-              <Button variant="text" color="info" size="small" href="/">
+              <Button variant="text" color="info" size="small" onClick={() => navigate("/")}>
                 Главная
               </Button>
-              <Button variant="text" color="info" size="small" href="/top">
+              <Button variant="text" color="info" size="small" onClick={() => navigate("/top")}>
                 Топ-направления
               </Button>
-              <Button variant="text" color="info" size="small" href="/search">
+              <Button variant="text" color="info" size="small" onClick={() => navigate("/search")}>
                 Поиск
               </Button>
             </Box>
