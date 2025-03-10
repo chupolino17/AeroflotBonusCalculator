@@ -1,0 +1,15 @@
+{
+  "short_name": "Aerflot Calculator",
+  "name": "Aerflot Bonus Calculator",
+  "icons": [
+    {
+      "src": "img-aeroflot_app_logo.svg",
+      "type": "image/svg",
+      "sizes": "56x56"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

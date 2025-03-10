@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+
+  pgdb:
+    image: postgres:17
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+    container_name: pgdb
+    volumes:
+      - pgdbdata:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    secrets:
+      - db_password
+
+  django:
+    build:
+      context: ./aeroflot_backend
+    container_name: django
+    environment:
+      - DJANGO_SECRET_FILE=/run/secrets/django_secret_key
+      - CLIENT_SECRET_FILE=/run/secrets/client_key
+    secrets:
+      - django_secret_key
+      - client_key
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./aeroflot_backend:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - pgdb
+
+  frontend:
+    build: ./aeroflot-frontend
+    container_name: frontend
+    volumes:
+      - ./aeroflot-frontend:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    depends_on:
+      - pgdb
+      - django
+
+  nginx:
+    image: nginx:latest
+    container_name: reverse_proxy
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    depends_on:
+      - django
+      - frontend
+
+secrets:
+  db_password:
+    file: secrets/db_password.txt
+  django_secret_key:
+    file: secrets/django_secret.txt
+  client_key:
+    file: secrets/client_secret.txt
+
+volumes:
+  pgdbdata: null
