@@ -7,14 +7,12 @@ services:
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+      - POSTGRES_PASSWORD=postgres
     container_name: pgdb
     volumes:
       - pgdbdata:/var/lib/postgresql/data/
     ports:
       - 5432:5432
-    secrets:
-      - db_password
 
   django:
     build:
